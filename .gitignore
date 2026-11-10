@@ -1,0 +1,18 @@
+# Per-user runtime settings. Each clone creates this from static/seed.json.
+/webui/presets.json
+/webui/*.tmp
+
+# Legacy database files and Python-generated files
+/webui/*.sqlite3
+__pycache__/
+*.py[cod]
+
+# Local research files and generated distribution copies
+/참고자료/
+/장비판매프리셋_v1 _배포용/
+/장비판매프리셋_v1 _배포용.zip
+
+# Local editor and operating-system files
+.vscode/
+.DS_Store
+Thumbs.db

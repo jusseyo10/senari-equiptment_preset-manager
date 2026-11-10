@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>장비 판매 프리셋</title>
+  <link rel="stylesheet" href="./style.css">
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>장비 판매 프리셋</h1>
+      <div class="toolbar">
+        <span id="status" aria-live="polite">불러오는 중</span>
+        <button id="undo" disabled>되돌리기</button>
+      </div>
+    </header>
+    <p id="error" role="alert" hidden></p>
+    <div id="app" class="workspace" hidden>
+      <section class="left-pane">
+        <nav class="left-tabs" role="tablist" aria-label="왼쪽 작업 화면">
+          <button class="left-tab" data-left-view="matrix" role="tab" aria-selected="true">옵션 매트릭스</button>
+          <button class="left-tab" data-left-view="sample" role="tab" aria-selected="false">4옵 장비 샘플</button>
+        </nav>
+        <div id="left-matrix-view" class="left-view" role="tabpanel">
+        <nav class="types" aria-label="장비 종류">
+          <button data-type="weapon">무기</button>
+          <button data-type="armor">방어구</button>
+        </nav>
+        <h2 class="group-title">세트 선택</h2>
+        <nav id="sets" aria-label="세트 효과"></nav>
+        <section class="matrix-panel">
+          <div class="matrix-heading">
+            <h2 id="title"></h2>
+          </div>
+          <div class="table-scroll"><table id="matrix" aria-label="주옵션과 부옵션 조합"></table></div>
+        </section>
+        </div>
+        <section id="sample-view" class="left-view sample-view" role="tabpanel" hidden>
+          <header class="sample-header">
+            <div>
+              <h2>4옵 장비 100개</h2>
+              <p>세트·주옵·부옵과 부옵 카운터를 임의 생성해 현재 판매 프리셋과 대조합니다.</p>
+            </div>
+            <div class="sample-actions">
+              <div class="sample-enhancement-controls" role="group" aria-label="샘플 장비 강화 단계">
+                <button class="sample-enhancement" type="button" data-sample-enhancement="0" aria-pressed="true">노강</button>
+                <button class="sample-enhancement" type="button" data-sample-enhancement="15" aria-pressed="false">15강</button>
+              </div>
+              <div class="sample-filter-controls" role="group" aria-label="샘플 판매 결과 필터">
+                <button class="sample-filter" type="button" data-sample-filter="all" aria-pressed="true">전체</button>
+                <button class="sample-filter" type="button" data-sample-filter="sold" aria-pressed="false">팔린 것만</button>
+                <button class="sample-filter" type="button" data-sample-filter="kept" aria-pressed="false">안 팔린 것만</button>
+              </div>
+              <button id="reroll-sample" type="button">다시 뽑기</button>
+            </div>
+          </header>
+          <div class="sample-roll-controls">
+            <div class="sample-picker-buttons" role="group" aria-label="샘플 추첨 조건">
+              <button id="sample-set-toggle" class="sample-picker-toggle" type="button" data-sample-menu="sets" aria-haspopup="dialog" aria-controls="sample-filter-popover" aria-expanded="false">
+                세트 <strong id="sample-set-summary">모두</strong>
+              </button>
+              <button id="sample-main-toggle" class="sample-picker-toggle" type="button" data-sample-menu="mains" aria-haspopup="dialog" aria-controls="sample-filter-popover" aria-expanded="false">
+                주옵션 <strong id="sample-main-summary">모두</strong>
+              </button>
+              <button id="reset-sample-filters" type="button">초기화</button>
+            </div>
+            <span id="sample-filter-hint">조건을 고른 뒤 다시 뽑으세요.</span>
+          </div>
+          <p id="sample-note" class="sample-note">6성 기본 부옵 수치로 표시합니다. 노강은 부옵 강화가 없습니다.</p>
+          <p id="sample-summary" aria-live="polite"></p>
+          <div id="sample-results" class="sample-results"></div>
+        </section>
+      </section>
+      <div class="splitter" role="separator" aria-orientation="vertical" aria-label="옵션 창 너비 조절" data-split="left" tabindex="0"></div>
+      <section id="analysis" class="preset-list-pane">
+        <header class="plan-header">
+          <div>
+            <h2>판매 프리셋</h2>
+            <p id="generation-status" aria-live="polite">현재 설정 기준</p>
+          </div>
+          <div class="plan-actions">
+            <strong id="plan-count" aria-live="polite"></strong>
+            <button id="generate" type="button">프리셋 생성</button>
+          </div>
+        </header>
+        <section id="preset-bulk-controls" aria-label="프리셋 일괄 설정">
+          <div class="bulk-rule-controls"><div class="bulk-rule-control include">
+              <span>포함</span>
+              <button id="preset-comparator-include" class="preset-comparator" type="button" title="포함 기준 이상/이하 전환">이상</button>
+              <label><select id="preset-count-include" aria-label="포함 카운터 일괄 설정"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>회</label>
+            </div><div class="bulk-rule-control exclude">
+              <span>제외</span>
+              <button id="preset-comparator-exclude" class="preset-comparator" type="button" title="제외 기준 이상/이하 전환">이상</button>
+              <label><select id="preset-count-exclude" aria-label="제외 카운터 일괄 설정"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>회</label>
+            </div></div>
+          <div class="bulk-min-count">
+            <span>포함 서브옵션 개수 일괄</span>
+            <div><button type="button" data-bulk-min-count="1" aria-pressed="false">1개</button><button type="button" data-bulk-min-count="2" aria-pressed="false">2개</button><button type="button" data-bulk-min-count="3" aria-pressed="false">3개</button><button type="button" data-bulk-min-count="4" aria-pressed="false">4개</button></div>
+          </div>
+        </section>
+        <section id="recommendations" class="recommendations" hidden aria-live="polite"></section>
+        <div class="v-splitter" role="separator" aria-orientation="horizontal" aria-label="제거 우선순위와 예상 점유율 높이 조절" data-vsplit="recommendations" tabindex="0"></div>
+        <section id="inventory-share-panel" aria-label="장비칸 예상 점유율"></section>
+        <div class="v-splitter" role="separator" aria-orientation="horizontal" aria-label="예상 점유율과 프리셋 목록 높이 조절" data-vsplit="inventory" tabindex="0"></div>
+        <ol id="preset-plan"></ol>
+      </section>
+      <div class="splitter" role="separator" aria-orientation="vertical" aria-label="프리셋 목록 너비 조절" data-split="middle" tabindex="0"></div>
+      <aside id="preset-detail" aria-label="선택한 프리셋 상세">
+        <header class="detail-header">
+          <h2 id="detail-title">프리셋을 선택하세요</h2>
+          <p id="analysis-summary"></p>
+        </header>
+        <div id="detail-content"></div>
+      </aside>
+    </div>
+  </main>
+  <div id="sample-filter-popover" class="sample-option-menu" role="dialog" aria-modal="false" hidden></div>
+</body>
+</html>
